@@ -131,13 +131,12 @@ class Client:
     def get_bans_min(self) -> List[int]:
         data, req = self._make_request('banlist/all')
 
-        if data:
-            if isinstance(data, int):
-                return [data]
-            else:
-                return [int(uid) for uid in data.split('\n')]
-        else:
+        if not data:
             return []
+        if isinstance(data, int):
+            return [data]
+        else:
+            return [int(uid) for uid in data.split('\n')]
 
     def add_ban(self, user_id: int, reason: str, message: Optional[str] = None) -> None:
         """Adds a ban
@@ -152,8 +151,7 @@ class Client:
         }
         if message:
             ban["message"] = message
-        self._make_request(f'banlist', method='post',
-                           json=[ban])
+        self._make_request('banlist', method='post', json=[ban])
 
     def add_bans(self, data: List[Ban]) -> None:
         """Add a list of Bans
@@ -162,8 +160,7 @@ class Client:
             data: List of Ban objects
         """
         _data = [{"id": d.id, "reason": d.reason} for d in data]
-        self._make_request(f'banlist', method='post',
-                           json=_data)
+        self._make_request('banlist', method='post', json=_data)
 
     def get_ban(self, user_id: int) -> Union[Ban, bool]:
         """Gets a ban
@@ -189,6 +186,6 @@ class Client:
     # region Stats
     def stats(self) -> Dict[str, int]:
         """Get ban stats"""
-        data, req = self._make_request(f'stats')
+        data, req = self._make_request('stats')
         return data
     # endregion
